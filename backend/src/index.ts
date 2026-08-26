@@ -16,6 +16,9 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Start worker in the same process (Render free tier doesn't support separate workers)
+import './workers/emailWorker';
+
 app.listen(config.port, () => {
   console.log(`[Server] Running on port ${config.port}`);
 });
