@@ -6,32 +6,43 @@ services:
     rootDir: backend
     buildCommand: npm install && npx prisma generate && npm run build
     startCommand: npx prisma migrate deploy && node dist/index.js
+
     envVars:
       - key: NODE_ENV
         value: production
+
       - key: DATABASE_URL
         fromDatabase:
           name: email-scheduler-db
           property: connectionString
+
       - key: REDIS_URL
         fromService:
           name: email-scheduler-redis
-          type: redis
+          type: keyvalue
           property: connectionString
+
       - key: FRONTEND_URL
         sync: false
+
       - key: GOOGLE_CLIENT_ID
         sync: false
+
       - key: GOOGLE_CLIENT_SECRET
         sync: false
+
       - key: SMTP_HOST
         value: smtp.ethereal.email
+
       - key: SMTP_PORT
         value: "587"
+
       - key: SMTP_USER
         sync: false
+
       - key: SMTP_PASS
         sync: false
+
 
   # Background Worker
   - type: worker
@@ -40,31 +51,42 @@ services:
     rootDir: backend
     buildCommand: npm install && npx prisma generate && npm run build
     startCommand: node dist/workers/emailWorker.js
+
     envVars:
       - key: NODE_ENV
         value: production
+
       - key: DATABASE_URL
         fromDatabase:
           name: email-scheduler-db
           property: connectionString
+
       - key: REDIS_URL
         fromService:
           name: email-scheduler-redis
-          type: redis
+          type: keyvalue
           property: connectionString
+
       - key: SMTP_HOST
         value: smtp.ethereal.email
+
       - key: SMTP_PORT
         value: "587"
+
       - key: SMTP_USER
         sync: false
+
       - key: SMTP_PASS
         sync: false
 
-  # Redis
-  - type: redis
+
+  # Redis / Key Value
+  - type: keyvalue
     name: email-scheduler-redis
     plan: free
+    ipAllowList:
+      - source: 0.0.0.0/0
+
 
 databases:
   - name: email-scheduler-db
