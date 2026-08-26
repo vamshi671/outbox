@@ -236,7 +236,7 @@ If Redis and its Docker volume are deleted, the queue job cannot be recovered by
 
 ## Demo Video
 
-[Demo Video](PASTE_VIDEO_LINK_HERE)
+[Demo Video](https://drive.google.com/file/d/1zmv0X5KW_ZvouLMKkjbW-sw7dyBNqLnn/view?usp=sharing)
 
 The demonstration should show scheduling emails, the Scheduled and Sent/Failed dashboard tabs, and the restart scenario. It may also show the hourly limit and worker concurrency configuration.
 
@@ -254,12 +254,12 @@ The demonstration should show scheduling emails, the Scheduled and Sent/Failed d
 
 ## Submission Checklist
 
-- [ ] Repository visibility is set to private on GitHub.
-- [ ] No `.env` files, credentials, API keys, or passwords are committed.
-- [ ] README explains backend, worker, infrastructure, frontend, environment, architecture, restart behavior, and trade-offs.
-- [ ] Ethereal SMTP credentials are configured locally using placeholders in examples.
-- [ ] PostgreSQL migration and Redis are running locally.
-- [ ] API and BullMQ worker are started in separate terminals.
-- [ ] Frontend starts and Google Sign-In is configured for `http://localhost:5173`.
-- [ ] Demo video link replaces `PASTE_VIDEO_LINK_HERE`.
-- [ ] Demo covers scheduled emails, dashboard results, and restart recovery.
+-   Repository visibility is set to private on GitHub.
+-   No `.env` files, credentials, API keys, or passwords are committed.
+-   README explains backend, worker, infrastructure, frontend, environment, architecture, restart behavior, and trade-offs.
+-   Ethereal SMTP credentials are configured locally using placeholders in examples.
+-   PostgreSQL migration and Redis are running locally.
+-   API and BullMQ worker are started in separate terminals.
+-   Frontend starts and Google Sign-In is configured for `http://localhost:5173`.
+-   Demo video link  `https://drive.google.com/file/d/1zmv0X5KW_ZvouLMKkjbW-sw7dyBNqLnn/view?usp=sharing`.
+-   Demo covers scheduled emails, dashboard results, and restart recovery.
