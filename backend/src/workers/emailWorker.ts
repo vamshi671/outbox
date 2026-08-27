@@ -2,7 +2,7 @@ import { Worker, Job } from 'bullmq';
 import { redisConnection } from '../config/redis';
 import { config } from '../config';
 import { prisma } from '../config/prisma';
-import { transporter } from '../config/mailer';
+import { resend, transporter } from '../config/mailer';
 
 interface EmailJobData {
   emailId: string;
@@ -48,13 +48,22 @@ async function processEmail(job: Job<EmailJobData>) {
   // Enforce delay between sends
   await new Promise((resolve) => setTimeout(resolve, config.rateLimit.delayBetweenEmailsMs));
 
-  // Send via Ethereal
-  await transporter.sendMail({
-    from: `"${sender}" <${config.smtp.user}>`,
-    to,
-    subject,
-    html: body,
-  });
+  // Send via Resend (HTTP) or Ethereal (SMTP fallback)
+  if (config.resendApiKey) {
+    await resend.emails.send({
+      from: `${sender} <onboarding@resend.dev>`,
+      to,
+      subject,
+      html: body,
+    });
+  } else {
+    await transporter.sendMail({
+      from: `"${sender}" <${config.smtp.user}>`,
+      to,
+      subject,
+      html: body,
+    });
+  }
 
   // Mark as sent
   await prisma.email.update({

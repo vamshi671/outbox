@@ -1,10 +1,13 @@
 import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import { config } from './index';
+
+export const resend = new Resend(config.resendApiKey);
 
 export const transporter = nodemailer.createTransport({
   host: config.smtp.host,
-  port: 465,
-  secure: true,
+  port: config.smtp.port,
+  secure: false,
   auth: {
     user: config.smtp.user,
     pass: config.smtp.pass,
