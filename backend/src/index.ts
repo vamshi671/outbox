@@ -25,7 +25,7 @@ import { emailQueue } from './config/queue';
 async function recoverEmails() {
   const stuck = await prisma.email.findMany({
     where: {
-      status: { in: ['SENDING', 'QUEUED'] },
+      status: { in: ['SENDING', 'QUEUED', 'SCHEDULED'] },
       scheduledAt: { lte: new Date() },
     },
   });

@@ -28,11 +28,11 @@ async function checkRateLimit(sender: string): Promise<boolean> {
 async function processEmail(job: Job<EmailJobData>) {
   const { emailId, to, subject, body, sender } = job.data;
 
-  // Check idempotency — skip if already sent
   const email = await prisma.email.findUnique({ where: { id: emailId } });
-  if (!email || email.status === 'SENT') {
-    return { skipped: true, reason: 'already sent or not found' };
+  if (!email || email.status === 'SENT' || email.status === 'FAILED') {
+    return { skipped: true, reason: 'already sent/failed or not found' };
   }
+  console.log(`[Worker] Processing ${emailId} → ${to}`);
 
   // Rate limit check
   const allowed = await checkRateLimit(sender);
@@ -72,6 +72,7 @@ const worker = new Worker<EmailJobData>('email-send', processEmail, {
 
 worker.on('failed', async (job, error) => {
   if (!job) return;
+  console.error(`[Worker] Job ${job.id} failed (attempt ${job.attemptsMade}): ${error.message}`);
 
   // If rate limited, reschedule with delay instead of marking as failed
   if (error.message.startsWith('RATE_LIMITED:')) {
