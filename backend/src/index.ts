@@ -21,11 +21,15 @@ import './workers/emailWorker';
 import { prisma } from './config/prisma';
 import { emailQueue } from './config/queue';
 
-// Recover emails stuck in SENDING (from cold start kills)
-async function recoverStuckEmails() {
-  const stuck = await prisma.email.findMany({ where: { status: 'SENDING' } });
+// Re-queue stuck or overdue emails (handles Redis eviction + cold start kills)
+async function recoverEmails() {
+  const stuck = await prisma.email.findMany({
+    where: {
+      status: { in: ['SENDING', 'QUEUED'] },
+      scheduledAt: { lte: new Date() },
+    },
+  });
   for (const email of stuck) {
-    await prisma.email.update({ where: { id: email.id }, data: { status: 'QUEUED' } });
     await emailQueue.add('send-email', {
       emailId: email.id,
       to: email.to,
@@ -34,10 +38,12 @@ async function recoverStuckEmails() {
       sender: email.sender,
     }, { jobId: `${email.id}-recover-${Date.now()}` });
   }
-  if (stuck.length) console.log(`[Recovery] Re-queued ${stuck.length} stuck emails`);
+  if (stuck.length) console.log(`[Recovery] Re-queued ${stuck.length} emails`);
 }
 
 app.listen(config.port, () => {
   console.log(`[Server] Running on port ${config.port}`);
-  recoverStuckEmails().catch(console.error);
+  recoverEmails().catch(console.error);
+  // Poll every 30s to catch jobs lost to Redis eviction
+  setInterval(() => recoverEmails().catch(console.error), 30000);
 });
