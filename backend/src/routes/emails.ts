@@ -119,7 +119,7 @@ router.get('/sent', async (req: AuthRequest, res: Response) => {
   const emails = await prisma.email.findMany({
     where: {
       userId: req.user!.id,
-      status: { in: ['SENT', 'FAILED'] },
+      status: { in: ['SENT', 'SENDING', 'FAILED'] },
     },
     orderBy: { sentAt: 'desc' },
   });
